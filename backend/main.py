@@ -84,7 +84,17 @@ def health():
 
 
 # ── Static Frontend ───────────────────────────────────────────────────────────
-FRONTEND_DIST = Path(__file__).parent.parent / "frontend" / "dist"
+import os
+
+# PyInstaller uses sys._MEIPASS to store bundled data
+if getattr(sys, 'frozen', False):
+    # Running as EXE
+    BASE_DIR = Path(sys._MEIPASS)
+    FRONTEND_DIST = BASE_DIR / "frontend" / "dist"
+else:
+    # Running as script
+    BASE_DIR = Path(__file__).parent.parent
+    FRONTEND_DIST = BASE_DIR / "frontend" / "dist"
 
 if FRONTEND_DIST.exists():
     app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")

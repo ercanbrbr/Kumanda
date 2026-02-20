@@ -26,35 +26,27 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from config import HOST, PORT, PIN as CONFIG_PIN
 from state import app_state
+from main import app  # Directly import the app object
 
+# ── Logging for debugging EXE ────────────────────────────────────────────────
+import logging
+logging.basicConfig(filename='kumanda_debug.log', level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
 # ── Icon generation ───────────────────────────────────────────────────────────
 
 def _make_icon_image(size: int = 64) -> Image.Image:
-    """
-    Draw a simple remote-control / wireless icon in memory.
-    No external image file required.
-    """
+    # ... (kodun kalan kısmı aynı, sadece import eklendi)
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     s = size
-
-    # Dark rounded background
     d.ellipse([2, 2, s - 2, s - 2], fill=(30, 30, 40, 255))
-
-    # Signal arcs (white)
     arc_color = (200, 200, 255, 220)
     for r in [10, 18, 26]:
-        x0 = s // 2 - r
-        y0 = s // 2 - r
-        x1 = s // 2 + r
-        y1 = s // 2 + r
+        x0, y0, x1, y1 = s // 2 - r, s // 2 - r, s // 2 + r, s // 2 + r
         d.arc([x0, y0, x1, y1], start=210, end=330, fill=arc_color, width=3)
-
-    # Center dot
     c = s // 2
     d.ellipse([c - 4, c - 4, c + 4, c + 4], fill=(255, 255, 255, 255))
-
     return img
 
 
@@ -65,15 +57,20 @@ _uvicorn_server: uvicorn.Server | None = None
 
 def _start_server():
     global _uvicorn_server
-    config = uvicorn.Config(
-        "main:app",
-        host=HOST,
-        port=PORT,
-        reload=False,
-        log_level="warning",   # quieter in tray mode
-    )
-    _uvicorn_server = uvicorn.Server(config)
-    _uvicorn_server.run()
+    logging.info(f"Starting uvicorn server on {HOST}:{PORT}")
+    try:
+        config = uvicorn.Config(
+            app,
+            host=HOST,
+            port=PORT,
+            reload=False,
+            log_level="warning",
+            log_config=None,  # This fixes the 'Unable to configure formatter' error in EXE
+        )
+        _uvicorn_server = uvicorn.Server(config)
+        _uvicorn_server.run()
+    except Exception as e:
+        logging.error(f"Uvicorn failed to start: {e}")
 
 
 def _stop_server():

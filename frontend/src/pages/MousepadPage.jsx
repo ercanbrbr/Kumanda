@@ -11,7 +11,7 @@ import { mouseWS } from '../services/ws';
  *   2 finger swipe  → scroll (vertical)
  */
 
-const SENSITIVITY = 1.8; // Multiply touch delta
+const SENSITIVITY = 2.5; // Multiply touch delta (Increased from 1.8)
 const SCROLL_SENSITIVITY = 0.4; // Increased 5x for natural feel
 const TAP_MAX_MOVE = 8;    // px – above this is a drag, not a tap
 const TAP_MAX_TIME = 200;  // ms
@@ -19,6 +19,7 @@ const TAP_MAX_TIME = 200;  // ms
 export default function MousepadPage() {
     const padRef = useRef(null);
     const touchDataRef = useRef(null); // stores start info
+    const scrollIntervalRef = useRef(null);
     const [connected, setConnected] = useState(false);
     const [feedback, setFeedback] = useState(null);
 
@@ -33,6 +34,7 @@ export default function MousepadPage() {
         return () => {
             clearInterval(interval);
             mouseWS.disconnect();
+            if (scrollIntervalRef.current) clearInterval(scrollIntervalRef.current);
         };
     }, []);
 
@@ -115,7 +117,22 @@ export default function MousepadPage() {
     };
 
     const sendScroll = (dir) => {
-        mouseWS.send({ type: 'scroll', dy: dir * 8 });
+        mouseWS.send({ type: 'scroll', dy: dir * 30 });
+    };
+
+    const startScrolling = (dir) => {
+        if (scrollIntervalRef.current) return;
+        sendScroll(dir);
+        scrollIntervalRef.current = setInterval(() => {
+            sendScroll(dir);
+        }, 80); // Decreased from 120ms to 80ms for faster repeat
+    };
+
+    const stopScrolling = () => {
+        if (scrollIntervalRef.current) {
+            clearInterval(scrollIntervalRef.current);
+            scrollIntervalRef.current = null;
+        }
     };
 
     return (
@@ -222,12 +239,18 @@ export default function MousepadPage() {
                     <button
                         className="btn btn-ghost"
                         style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                        onClick={() => sendScroll(1)}
+                        onPointerDown={() => startScrolling(1)}
+                        onPointerUp={stopScrolling}
+                        onPointerLeave={stopScrolling}
+                        onTouchEnd={stopScrolling}
                     >▲</button>
                     <button
                         className="btn btn-ghost"
                         style={{ padding: '6px 14px', fontSize: '0.8rem' }}
-                        onClick={() => sendScroll(-1)}
+                        onPointerDown={() => startScrolling(-1)}
+                        onPointerUp={stopScrolling}
+                        onPointerLeave={stopScrolling}
+                        onTouchEnd={stopScrolling}
                     >▼</button>
                 </div>
                 <button
