@@ -1,0 +1,7 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pycaw==20240210
+screen-brightness-control==0.23.0
+pyautogui==0.9.54
+python-dotenv==1.0.1
+comtypes==1.4.8
