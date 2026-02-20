@@ -16,7 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-from config import HOST, PORT
+from config import HOST, PORT, PIN as CONFIG_PIN
+from state import app_state
 from api.auth import PinAuthMiddleware
 from api import audio as audio_router
 from api import display as display_router
@@ -37,6 +38,10 @@ def get_local_ip() -> str:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Seed live state from config (for direct `python main.py` usage)
+    app_state.pin = CONFIG_PIN
+    app_state.server_active = True
+
     ip = get_local_ip()
     sep = "=" * 50
     print(f"\n{sep}")

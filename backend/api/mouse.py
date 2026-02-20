@@ -10,6 +10,7 @@ Event formats:
 import json
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from system import mouse
+from state import app_state
 
 router = APIRouter(tags=["mouse"])
 
@@ -17,6 +18,7 @@ router = APIRouter(tags=["mouse"])
 @router.websocket("/ws/mouse")
 async def mouse_websocket(ws: WebSocket):
     await ws.accept()
+    app_state.register_ws(ws)
     try:
         while True:
             raw = await ws.receive_text()
@@ -45,5 +47,7 @@ async def mouse_websocket(ws: WebSocket):
                 dy = int(event.get("dy", 0))
                 mouse.scroll(dy)
 
-    except WebSocketDisconnect:
+    except (WebSocketDisconnect, Exception):
         pass
+    finally:
+        app_state.unregister_ws(ws)
