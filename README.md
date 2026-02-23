@@ -1,45 +1,47 @@
 # 📱 Kumanda
 
-A local network PC controller app — control your computer from your phone's browser.
+Control your PC from your phone's browser. Simple, fast, and wireless.
 
-> 🤖 Entirely built with **vibe coding** using AI assistance.
+> 🤖 Built with **vibe coding** using AI.
 
-## Features
+## ✨ Features
 
-- 🔊 Audio volume control
-- 🔆 Display brightness control
-- 🖱️ Phone as a wireless mousepad
-- ⏯️ Media playback controls (play, pause, next, previous)
-- 🌐 Mobile-first web UI, no app install needed
+- 🔊 **Sound:** Adjust volume or mute.
+- 🔆 **Brightness:** Change screen brightness.
+- 🖱️ **Mouse:** Use your phone as a wireless touchpad.
+- ⏯️ **Media:** Control music and videos (Play/Pause/Skip).
+- 🌐 **No Apps:** Works in any mobile browser on your Wi-Fi.
 
-## Tech Stack
+---
 
-| Layer | Tech |
-|-------|------|
-| Backend | Python, FastAPI, Uvicorn |
-| System | pycaw, screen-brightness-control, pyautogui |
-| Frontend | React 19, Vite, React Router |
+## 🛠️ Setup (Simple 3 Steps)
 
-## Getting Started
+### 1. Preparation
+*   Install **Python 3.10 - 3.12 (Recommended)** and **Node.js**.
+*   Connect your phone and PC to the **same Wi-Fi**.
 
-### Backend
-
+### 2. Build & Run
+Open your terminal and run these commands:
 ```bash
-cd backend
-pip install -r requirements.txt
-python main.py
-```
-
-### Frontend
-
-```bash
+# Build the interface
 cd frontend
-npm install
-npm run dev
+npm install && npm run build
+
+# Start the application
+cd ../backend
+pip install -r requirements.txt
+python tray.py
 ```
+*An icon will appear in the system tray. Right-click it to set a **PIN**.*
 
-Then open the displayed local IP address on your phone (same Wi-Fi network required).
+### 3. Connect
+1. Enter the **Network URL** from the terminal (e.g., `http://192.168.1.50:8000`) into your phone's browser.
+2. Enter your PIN and start controlling!
 
-## License
+---
 
+> [!TIP]
+> **Connection Issue?** If the page doesn't open, make sure Windows Firewall allows Python to communicate.
+
+## 📜 License
 MIT © 2026
